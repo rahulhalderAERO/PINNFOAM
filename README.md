@@ -5,4 +5,7 @@ We aim to couple the Full Order Model (FOM) and the Reduced Order Model (ROM), b
 And the available Codes: 
 👉 https://github.com/rahulhalderAERO/Paper-DisPINN1
 
-In the current Codes, we first demonstrate how to couple a full-order model with an example of a Nonlinear Conservation Law Equation with the PINN. 
+# FOM + PINN
+
+In the current codes, we first demonstrate how to couple a full-order model (FOM) with a Physics-Informed Neural Network (PINN) using an example of a nonlinear conservation law equation.
+
