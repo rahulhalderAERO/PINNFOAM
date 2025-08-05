@@ -14,14 +14,37 @@ In the current codes, we first demonstrate how to couple a full-order model (FOM
 Go inside the folder `NCL-FOM` and install PINA by running:
 
 ```bash
-pip install -e .
-
+pip install -e.
+```
 ### Step 2
 
 Go to the folder `NCL_Equation_Example` and run the script `run_burgers_Dis_ANN.py` with:
 
-```bash
-python3 run_burgers_Dis_ANN.py -s 0 0
+    python3 run_burgers_Dis_ANN.py -s 0 0
+
+## Code Structure
+
+Here we discuss different parts of the code. From the OpenFOAM side, the folders `0`, `constant`, and `system` should be present, as they contain the initial conditions, physical properties, and simulation setup, respectively. Additionally, the code file `of_pybind11_system.C` builds the bridge between the PINN code written in PyTorch and OpenFOAM.
+
+The overall folder structure looks like this:
+
+```text
+📁 NCL_Equation_Example
+├── 📁 0
+│   └── <initial condition files>
+├── 📁 constant
+│   └── <physical property files>
+├── 📁 system
+│   └── <simulation control files>
+├── 📁 Make
+│   └── <pybind build configuration files>
+├── 🧠 of_pybind11_system.C
+├── 🐍 run_NCL_DisPINN.py (Main Script)
+
+```
+
+
+
 
 
 
