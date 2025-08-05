@@ -26,10 +26,12 @@ Go to the folder `NCL_Equation_Example` and run the script `run_burgers_Dis_ANN.
 
 Here we discuss different parts of the code. From the OpenFOAM side, the folders `0`, `constant`, and `system` should be present, as they contain the initial conditions, physical properties, and simulation setup, respectively. Additionally, the code file `of_pybind11_system.C` builds the bridge between the PINN code written in PyTorch and OpenFOAM.
 
+The `problems/` folder contains the Python-side problem definitions, which describe how the PINN is coupled with the nonlinear conservation law (NCL) as solved in OpenFOAM. This folder is essential for defining the PINN structure, loss formulation, and data interfacing.
+
 The overall folder structure looks like this:
 
 ```text
-📁 NCL_Equation_Example
+📁 NCL-FOM
 ├── 📁 0
 │   └── <initial condition files>
 ├── 📁 constant
@@ -37,10 +39,12 @@ The overall folder structure looks like this:
 ├── 📁 system
 │   └── <simulation control files>
 ├── 📁 Make
-│   └── <pybind build configuration files>
+│   └── <OpenFOAM build configuration files>
+├── 📁 problems
+│   └── <Python definitions for PINN–OpenFOAM coupling>
 ├── 🧠 of_pybind11_system.C
-├── 🐍 run_NCL_DisPINN.py (Main Script)
-
+├── 🐍 run_NCL_DisPINN.py
+└── 📄 other_code_files...
 ```
 
 
