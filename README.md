@@ -16,4 +16,12 @@ Go inside the folder `NCL-FOM` and install PINA by running:
 ```bash
 pip install -e .
 
+### Step 2
+
+Go to the folder `NCL_Equation_Example` and run the script `run_burgers_Dis_ANN.py` with:
+
+```bash
+python3 run_burgers_Dis_ANN.py -s 0 0
+
+
 
