@@ -63,10 +63,40 @@ Eigen::SparseMatrix<double> get_system_matrix(Eigen::VectorXd& U)
     Foam2Eigen::fvMatrix2Eigen(UEqn, A, b);
     return A;
 }
+
+Eigen::VectorXd get_rhs(Eigen::VectorXd& U)//,Eigen::VectorXd& S)
+    {
+        Foam2Eigen::Eigen2field(_U(), U);
+        fvVectorMatrix UEqn(fvm::ddt(_U()) + fvc::div(_phi(), _U()) - fvm::laplacian(_nu(),_U()));
+        Eigen::SparseMatrix<double> A;
+        Eigen::VectorXd b;
+        Foam2Eigen::fvMatrix2Eigen(UEqn, A, b);
+        return b;
+    }
+
+```
+
+## Python–OpenFOAM Integration (NCL_tensor_discrete_ANN.py)
+
+The part of the code responsible for calling the `A` matrix and `b` vector from the Python side is located in:
+```text
+📁 problems
+└── 📄 NCL_tensor_discrete_ANN.py
 ```
 
 
+This script serves as the Python interface for interacting with the linearised system assembled in OpenFOAM. It calls the C++ function `get_system_matrix(...)` (exposed via `pybind11`) to fetch the current state of the system matrix `A` and the corresponding right-hand side vector `b`.These matrices and vectors are then used in the PINN's loss formulation to enforce consistency with the discretised PDE. This tight coupling allows the neural network to learn from and adapt to the dynamics governed by the OpenFOAM solver in real time. This integration is critical for implementing discrete PINNs (DisPINNs), where the loss is built directly from the residuals of the numerical system, ensuring physics fidelity without symbolic differentiation.
+
+```python
+A = a.get_system_matrix(U)
+A_array = A.toarray()
+b = a.get_rhs(U)
+AR_tensor = torch.from_numpy(A_array).float()
+bR_tensor = torch.from_numpy(b).float().reshape(-1, 1)
+```
 
 
+## ROM + PINN
 
+In the current codes, we first demonstrate how to couple a reduced-order model (FOM) with a Physics-Informed Neural Network (PINN) using an example of a Flow past an incompressible flow. 
 
