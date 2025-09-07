@@ -109,54 +109,9 @@ class Plotter:
         predicted_output_array = predicted.detach().numpy()
         pts_array = pts.detach().numpy()        
         mdic = {"predicted_output_test_0":predicted_output_array, "pts_array_test_0":pts_array}
-        savemat("Burgers_Dis_test_0.mat", mdic)
+        savemat("Output/FPC_Dis_test_0.mat", mdic)
         
-    # def plot(self, pinn, components=None, fixed_variables={}, method='contourf',
-             # res= 1000, filename=None, **kwargs):
-        # """
-        # """
-        # if components is None:
-            # components = [pinn.problem.output_variables]
-        # v = [
-            # var for var in pinn.problem.input_variables
-            # if var not in fixed_variables.keys()
-        # ]
-        # # pts = pinn.problem.domain.sample(res, 'grid', variables=v)
-        # pts = pinn.problem.domain.sample_tensor_given_pts(res, variables=v)
-        # # fixed_pts = torch.ones(pts.shape[0], len(fixed_variables))
-        # # fixed_pts *= torch.tensor(list(fixed_variables.values()))
-        # # fixed_pts = fixed_pts.as_subclass(LabelTensor)
-        # # fixed_pts.labels = list(fixed_variables.keys())
-
-        # # pts = pts.append(fixed_pts)
-        # pts = pts.to(device=pinn.device)
-
-        # predicted_output = pinn.model(pts)
-        # if isinstance(components, str):
-            # predicted_output = predicted_output.extract(components)
-        # elif callable(components):
-            # predicted_output = components(predicted_output)
-
-        # # truth_solution = getattr(pinn.problem, 'truth_solution', None)
-        # # if len(v) == 1:
-            # # self._1d_plot(pts, predicted_output, method, truth_solution,
-                          # # **kwargs)
-        # # elif len(v) == 2:
-            # # self._2d_plot(pts, predicted_output, v, res, method,
-                          # # truth_solution, **kwargs)
-        
-        # predicted_output_array = predicted_output.detach().numpy()
-        # pts_array = pts.detach().numpy()
-        
-        # mdic = {"predicted_output_ANN_0":predicted_output_array, "pts_array_Dis_ANN_0":pts_array}
-        # savemat("Burgers_Dis_ANN_0.mat", mdic)
-        
-        # # if filename:
-            # # plt.title('Output {} with parameter {}'.format(components,
-                                                           # # fixed_variables))
-            # # plt.savefig(filename)
-        # # else:
-            # # plt.show()
+    
             
         
 
@@ -176,7 +131,7 @@ class Plotter:
             # loss = loss[:, 0]
         
         mdic_loss = {"epochs_dis_test_0":epochs, "loss_dis_test_0":loss}
-        savemat("Burgers_loss_dis_test_0.mat", mdic_loss)
+        savemat("Output/FPC_loss_dis_test_0.mat", mdic_loss)
         # plt.plot(epochs, loss, label=label)
         # if log_scale:
             # plt.yscale('log')

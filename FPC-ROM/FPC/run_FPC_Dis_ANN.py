@@ -57,13 +57,10 @@ if __name__ == "__main__":
             {'n': 100,'variables': 'all'},
             locations=['A','D'])
         pinn.train(5000, 1)
-        pinn.save_state('pina.FPC_dis.{}.{}'.format(args.id_run, args.features))
+        pinn.save_state('pina.FPC_dis.{}.{}'.format(args.id_run, args.features))        
+    else:
+        pinn.load_state('pina.FPC_dis.{}.{}'.format(args.id_run, args.features))
         plotter = Plotter()        
         plotter.plot_same_training_test_data(pinn)
         plotter.plot_loss(pinn)
-    # else:
-        # pinn.load_state('pina.burger_dis1.{}.{}'.format(args.id_run, args.features))
-        # plotter = Plotter()
-        # plotter.plot(pinn)
-        # plotter.plot_loss(pinn)
 
