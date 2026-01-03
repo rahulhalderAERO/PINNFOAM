@@ -13,11 +13,11 @@ import pandas as pd
 import random
 import numpy as np
 
-output_data = pd.read_csv("Uprofile_final_3input.csv",skiprows = None , header = None)
+output_data = pd.read_csv("Input/Uprofile_final_3input.csv",skiprows = None , header = None)
 output_data = output_data.values #[0:1001,:]
 output_tensor = (torch.from_numpy(output_data)).float()
 
-input_data = pd.read_csv("Time_profile_final.csv",skiprows = None , header = None)
+input_data = pd.read_csv("Input/Time_profile_final.csv",skiprows = None , header = None)
 input_data = input_data.values #[0:2001,1].reshape(-1,1)
 input_tensor = (torch.from_numpy(input_data)).float()
 
@@ -199,3 +199,4 @@ class FPC2D(TimeDependentProblem):
         # 'D': Condition(Span({'t': input_tensor.reshape(-1,1)}), [burger_equation]),
         'E': Condition(input_points = input_tensor,output_points = output_tensor),
     }
+
