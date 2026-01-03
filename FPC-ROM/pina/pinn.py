@@ -306,7 +306,7 @@ class PINN(object):
                         y_mid = y_mid_dict['new_tensor']
                         y_midp = y_mid_dict['new_tensor_p']
                         y_mid_sq = y_mid.pow(2)
-                        # L = torch.linalg.torch.mean(y_mid_sq) 
+                        # L = torch.mean(y_mid_sq) 
                         # losses.append(L)                       
                         y_mid_d = y_mid.detach()
                         y_midp_d = y_midp.detach()
@@ -329,13 +329,13 @@ class PINN(object):
                         # print("dmulty_Mat is ===", dmulty_Mat.shape)
                         Res_Dis = 0.1*(2*y_mid_d*y_mid - 2*y_mid_d*dmulty_Mat)                        
                         # # ===== Loss Computation Phase I================================================================                                                
-                        L_Dis = torch.linalg.torch.mean(Res_Dis)
+                        L_Dis = torch.mean(Res_Dis)
                         losses.append(L_Dis) 
 
                                                 
                         Res_Dis_p = 0.1*(2*y_midp_d*dmulty_Mat_p)                        
                         # # ===== Loss Computation Phase I================================================================                                                
-                        L_Dis_p = torch.linalg.torch.mean(Res_Dis_p)
+                        L_Dis_p = torch.mean(Res_Dis_p)
                         losses.append(L_Dis_p) 
                         
                 if hasattr(condition, 'output_points'):
