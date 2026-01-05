@@ -116,7 +116,7 @@ plt.plot(t[0:1001], scaled_pred_data[1001:2002,which_coeff],
 
 
 
-plt.xlabel('time',fontsize=20)
+plt.xlabel('time step',fontsize=20)
 plt.ylabel('Coeff_{}'.format(which_coeff), fontsize=20)
 plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
@@ -134,3 +134,4 @@ np.save('Output/prediction_Dis.npy',scaled_pred_dis)
 
 
   
+
