@@ -5,6 +5,9 @@ We aim to couple the Full Order Model (FOM) and the Reduced Order Model (ROM), b
 And the available Codes: 
 👉 https://github.com/rahulhalderAERO/Paper-DisPINN1
 
+
+First, ITHACA-FV needs to be installed: 
+👉 [https://github.com/rahulhalderAERO/ITHACA-FV/tree/dispinn_final](https://github.com/rahulhalderAERO/ITHACA-FV/tree/dispinn_final)
 ## ⚙️ FOM + PINN
 
 In the current codes, we first demonstrate how to couple a full-order model (FOM) with a Physics-Informed Neural Network (PINN) using an example of a nonlinear conservation law equation.
