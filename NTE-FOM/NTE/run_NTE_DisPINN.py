@@ -57,6 +57,70 @@ if __name__ == "__main__":
         error_norm='mse',
         regularizer=0)
 
+
+
+    if args.s:
+     pinn.span_tensor_given_pts(
+        {'n': 200, 'variables': 'all'},
+        locations=['A', 'D']
+     )
+     pinn.train(3999, 1)
+     pinn.save_state_old('pina.burger_disdataphysics_0.{}.{}'.format(args.id_run, args.features))
+
+    else:
+     U_mat = np.load("U_Mat_FOM.npy").transpose()
+     pinn.load_state_old(f"pina.burger_disdataphysics_0.{args.id_run}.{args.features}")
+
+     plotter = Plotter()
+     plotter.plot_same_training_test_data(pinn)
+     plotter.plot_loss(pinn)
+
+     predicted_output = np.load("predicted_output.npy")
+     print("predicted_output ==", predicted_output)
+
+     # Build full field U
+     U_z = np.zeros((200, 400))
+     U_y = predicted_output
+     U_all = [predicted_output, U_y, U_z]
+     U = np.hstack(U_all)
+
+     # Time steps
+     Tmax = 200  # or Tmax = U.shape[0]
+
+     # Base directories
+     pred_base = "Prediction_With_DataPhysics1_0"
+     err_base  = "Error_With_DataPhysicscheck1_0"
+
+     # Make sure base folders exist once
+     os.makedirs(pred_base, exist_ok=True)
+     #os.makedirs(err_base,  exist_ok=True)
+
+     for i in range(Tmax):
+        print("Timestep ========", i)
+        time_str = str(i)
+
+        # Per-step subfolders
+        pred_dir = os.path.join(pred_base, time_str)
+        err_dir  = os.path.join(err_base,  time_str)
+
+        os.makedirs(pred_dir, exist_ok=True)
+        #os.makedirs(err_dir,  exist_ok=True)
+
+        # Extract snapshot and error
+        U_instant = U[i, :].reshape(-1, 1)
+        U_error   = np.abs(U[i, :] - U_mat[i, :]).reshape(-1, 1)
+
+        # Export prediction
+        a.setU(U_instant)
+        if i != 0:  # keep your original behavior
+            a.exportU(".", pred_dir, "U")
+
+            # Export error
+            #a.setU(U_error)
+            #a.exportU(".", err_dir, "U")
+
+
+    """
     if args.s:
         pinn.span_tensor_given_pts(
             {'n': 200,'variables': 'all'},
@@ -94,6 +158,6 @@ if __name__ == "__main__":
               a.setU(U_error)
               a.exportU(".", err_dir, "U")
 
-     
+     """
 
 

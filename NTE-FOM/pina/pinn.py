@@ -1,6 +1,8 @@
 """ Module for PINN """
 import torch
 
+from torch import optim
+from torch.serialization import safe_globals  # PyTorch 2.6+
 from .problem import AbstractProblem
 from .label_tensor import LabelTensor
 import numpy
@@ -17,7 +19,7 @@ class PINN(object):
     def __init__(self,
             problem,
             model,
-            optimizer=torch.optim.Adam,
+            optimizer=optim.Adam,
             lr=0.001,
             regularizer=0.00001,
             dtype=torch.float32,
@@ -95,7 +97,7 @@ class PINN(object):
         else:
             raise RuntimeError
 
-    def save_state(self, filename):
+    def save_state_old(self, filename):
 
         checkpoint = {
                 'epoch': self.trained_epoch,
@@ -113,9 +115,9 @@ class PINN(object):
         #    }
         torch.save(checkpoint, filename)
 
-    def load_state(self, filename):
+    def load_state_old(self, filename):
 
-        checkpoint = torch.load(filename)
+        checkpoint = torch.load(filename, weights_only=False)
         self.model.load_state_dict(checkpoint['model_state'])
 
 
@@ -128,6 +130,119 @@ class PINN(object):
         self.input_pts = checkpoint['input_points_dict']
 
         return self
+
+    def save_state(self, filename: str):
+        """PyTorch 2.6-safe save: only primitives + state_dicts (no classes/functions)."""
+        opt = self.optimizer
+        opt_name = opt.__class__.__name__
+        # keep only primitive kwargs (no tensors/callables)
+        def _primitive(v):
+            return isinstance(v, (int, float, bool, str, type(None), tuple, list, dict))
+        opt_kwargs = {k: v for k, v in getattr(opt, "defaults", {}).items() if _primitive(v)}
+    
+        checkpoint = {
+            "epoch": getattr(self, "trained_epoch", 0),
+            "model_state": self.model.state_dict(),
+            "optimizer_state": opt.state_dict(),
+            "optimizer_name": opt_name,          # string instead of class
+            "optimizer_kwargs": opt_kwargs,      # primitives only
+            "history": getattr(self, "history_loss", None),
+            "input_points_dict": getattr(self, "input_pts", None),
+            "torch_version": torch.__version__,
+        }
+        torch.save(checkpoint, filename)
+    
+    def load_state(self, filename: str, map_location=None, strict: bool = True, allow_unsafe: bool = False):
+
+        """
+
+        Load a checkpoint under PyTorch 2.6 default safety (weights_only=True).
+
+        Falls back to allowlisting common optimizer classes; optionally to unsafe load.
+
+        """
+
+        # 1) safest attempt
+        try:
+
+            checkpoint = torch.load(filename, map_location=map_location, weights_only=True)
+
+        except Exception:
+
+            # 2) help old checkpoints that referenced optimizer classes
+
+            common_opt_classes = [
+
+                optim.Adam, optim.AdamW, optim.SGD, optim.RMSprop, optim.Adagrad,
+
+                getattr(optim, "Adamax", None), getattr(optim, "Adadelta", None),
+
+                getattr(optim, "NAdam", None), getattr(optim, "RAdam", None),
+
+                getattr(optim, "ASGD", None), getattr(optim, "LBFGS", None),
+
+            ]
+
+            common_opt_classes = [c for c in common_opt_classes if c is not None]
+
+            try:
+
+                with safe_globals(common_opt_classes):
+
+                    checkpoint = torch.load(filename, map_location=map_location, weights_only=True)
+
+            except Exception:
+
+                # 3) last resort (only if you trust the file)
+
+                if not allow_unsafe:
+
+                    raise
+
+                checkpoint = torch.load(filename, map_location=map_location, weights_only=False)
+    
+        # --- restore model ---
+
+        missing, unexpected = self.model.load_state_dict(checkpoint["model_state"], strict=strict)
+
+        if missing or unexpected:
+
+            print(f"[load_state] missing_keys={missing}, unexpected_keys={unexpected}")
+    
+        # --- rebuild optimizer, then load its state ---
+
+        # prefer new-style fields
+
+        opt_name = checkpoint.get("optimizer_name")
+
+        opt_kwargs = checkpoint.get("optimizer_kwargs", {})
+    
+        # legacy compatibility: old checkpoints might have pickled the class
+
+        if opt_name is None and "optimizer_class" in checkpoint and hasattr(checkpoint["optimizer_class"], "__name__"):
+
+            opt_name = checkpoint["optimizer_class"].__name__
+
+        if opt_name is None:
+
+            opt_name = "Adam"  # safe fallback
+    
+        opt_cls = getattr(optim, opt_name, optim.Adam)
+        self.optimizer = opt_cls(self.model.parameters(), **opt_kwargs)
+
+        self.optimizer.load_state_dict(checkpoint["optimizer_state"])
+    
+        # --- bookkeeping ---
+
+        self.trained_epoch = checkpoint.get("epoch", 0)
+
+        self.history_loss = checkpoint.get("history", None)
+
+        self.input_pts = checkpoint.get("input_points_dict", None)
+    
+        return self
+
+ 
     
     def span_tensor_given_pts(self, *args, **kwargs):
         arguments = args[0]
@@ -291,8 +406,8 @@ class PINN(object):
                         y_mid = function(self,pts_new, predicted)
                         Res_Dis = 20*y_mid*dydo_mult_o_Dis                        
                         # ===== Loss Computation Phase I================================================================                        
-                        L = torch.linalg.torch.mean(y_mid.pow(2))
-                        L_Dis = torch.linalg.torch.mean(Res_Dis)
+                        L = torch.mean(y_mid.pow(2))
+                        L_Dis = torch.mean(Res_Dis)
                         losses.append(L)
                         losses_Dis.append(L_Dis)
                 
@@ -382,7 +497,7 @@ class PINN(object):
                     for function in condition.function:                                                
                         y_mid = function(self,pts_new, predicted) 
                         y_mid_sq = y_mid.pow(2)
-                        L = torch.linalg.torch.mean(y_mid_sq) 
+                        L = torch.mean(y_mid_sq) 
                         losses.append(L)
                         y_mid_d = y_mid.detach()
                         
@@ -397,9 +512,9 @@ class PINN(object):
                             k = k+1
                          
 
-                        Res_Dis = 10*(y_mid_sq - 2*y_mid_d*dmulty_Mat)                        
+                        Res_Dis = 25*(y_mid_sq - 2*y_mid_d*dmulty_Mat)                        
                         # ===== Loss Computation Phase I================================================================                                                
-                        L_Dis = torch.linalg.torch.mean(Res_Dis)
+                        L_Dis = torch.mean(Res_Dis)
                         losses.append(L_Dis)
                         
 

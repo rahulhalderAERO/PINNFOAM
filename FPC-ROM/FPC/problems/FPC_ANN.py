@@ -199,4 +199,3 @@ class FPC2D(TimeDependentProblem):
         # 'D': Condition(Span({'t': input_tensor.reshape(-1,1)}), [burger_equation]),
         'E': Condition(input_points = input_tensor,output_points = output_tensor),
     }
-
