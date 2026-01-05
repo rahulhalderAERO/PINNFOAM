@@ -305,8 +305,8 @@ class PINN(object):
                         y_mid_dict = function(self,pts_new, predicted) 
                         y_mid = y_mid_dict['new_tensor']
                         y_midp = y_mid_dict['new_tensor_p']
-                        y_mid_sq = y_mid.pow(2)
-                        # L = torch.mean(y_mid_sq) 
+                        #y_mid_sq = y_mid.pow(2)
+                        # L = torch.linalg.torch.mean(y_mid_sq) 
                         # losses.append(L)                       
                         y_mid_d = y_mid.detach()
                         y_midp_d = y_midp.detach()

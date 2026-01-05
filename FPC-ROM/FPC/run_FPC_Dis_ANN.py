@@ -56,7 +56,7 @@ if __name__ == "__main__":
         pinn.span_tensor_given_pts(
             {'n': 100,'variables': 'all'},
             locations=['A','D'])
-        pinn.train(5000, 1)
+        pinn.train(5, 1)
         pinn.save_state('pina.FPC_dis.{}.{}'.format(args.id_run, args.features))        
     else:
         pinn.load_state('pina.FPC_dis.{}.{}'.format(args.id_run, args.features))
