@@ -512,7 +512,7 @@ class PINN(object):
                             k = k+1
                          
 
-                        Res_Dis = 25*(y_mid_sq - 2*y_mid_d*dmulty_Mat)                        
+                        Res_Dis = 10*(y_mid_sq - 2*y_mid_d*dmulty_Mat)                        
                         # ===== Loss Computation Phase I================================================================                                                
                         L_Dis = torch.mean(Res_Dis)
                         losses.append(L_Dis)
