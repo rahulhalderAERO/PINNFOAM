@@ -21,9 +21,9 @@ pip install -e.
 ```
 ### Step 2
 
-Go to the folder `NTE_Equation_Example` and run the script `run_burgers_Dis_ANN.py` with:
+Go to the folder `NTE_Equation_Example` and run the script `run_NTE_Dis_ANN.py` with:
 
-    python3 run_burgers_Dis_ANN.py -s 0 0
+    python3 run_NTE_Dis_ANN.py -s 0 0
 
 ## Code Structure
 
@@ -47,7 +47,7 @@ The overall folder structure looks like this:
 ├── 🐍 run_NTE_DisPINN.py
 └── 📄 other_code_files...
 ```
-Here, the input the outputs are computed in the `problems/burgers_tensor_discrete_ANN.py` script. However it could be provided additionally. 
+Here, the input the outputs are computed in the `problems/NTE_tensor_discrete_ANN.py` script. However it could be provided additionally. 
 
 
 ## C++–Python Coupling (of_pybind11_system.C)
